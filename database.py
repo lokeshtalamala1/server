@@ -444,7 +444,7 @@ async def get_customer_transactions(
 #             )
 
 #         return f"{len(classifications)} transactions classified and stored successfully for customer {customer_id}."
-
+app = mcp.app
 
 if __name__ == "__main__":
     mcp.run()
