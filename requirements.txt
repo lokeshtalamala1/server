@@ -1,0 +1,7 @@
+langchain-openai
+python-dotenv
+httpx
+mcp-use
+fastapi
+uvicorn
+asyncpg 
