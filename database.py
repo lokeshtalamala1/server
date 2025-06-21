@@ -13,17 +13,6 @@ load_dotenv()
 # Initialize FastMCP
 mcp = FastMCP("Remote MCP Server")
 
-# Create a FastAPI app manually
-app = FastAPI()
-
-# Mount MCP onto FastAPI
-app.mount("/mcp", mcp.streamable_http_app())
-
-# Now you can add custom routes!
-@app.get("/health", response_class=PlainTextResponse)
-async def health_check():
-    return "✅ MCP is alive and well"
-
 # Database config
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = int(os.getenv("DB_PORT", 5432))
@@ -112,3 +101,15 @@ async def get_customer_transactions(customer_id: str, months_back: int = 6) -> s
 
         lines.append("-" * 75)
         return "\n".join(lines[:50]) + ("\n...more..." if len(rows) > 50 else "")
+
+
+# Create a FastAPI app manually
+app = FastAPI()
+
+# Mount MCP onto FastAPI
+app.mount("/mcp", mcp.streamable_http_app())
+
+# Now you can add custom routes!
+@app.get("/health", response_class=PlainTextResponse)
+async def health_check():
+    return "✅ MCP is alive and well"
