@@ -1,16 +1,26 @@
-from typing import Any
-import asyncpg
 import os
-from datetime import datetime, timedelta, date
+import asyncpg
+from datetime import datetime, timedelta
+from fastapi import FastAPI
+from fastapi.responses import PlainTextResponse
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
 
+# Load environment variables from .env file
 load_dotenv()
 
-# Initialize FastMCP
+# Setup MCP
 mcp = FastMCP("Remote MCP Server")
 
-# Env vars
+# Expose FastAPI app from MCP for HTTP tool interface
+app = mcp.streamable_http_app
+
+# Optional: add basic health check route
+@app.get("/health", response_class=PlainTextResponse)
+async def health_check():
+    return "✅ Server is healthy and running MCP."
+
+# Database config
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = int(os.getenv("DB_PORT", 5432))
 DB_NAME = os.getenv("DB_NAME", "postgres")
@@ -38,19 +48,13 @@ async def get_db_pool():
     return _db_pool
 
 @mcp.tool()
-async def get_customer_transactions(
-    customer_id: str,
-    months_back: int = 6
-) -> str:
+async def get_customer_transactions(customer_id: str, months_back: int = 6) -> str:
     pool = await get_db_pool()
-
     async with pool.acquire() as conn:
-        # Check customer
         accounts = await conn.fetch("SELECT account_id FROM accounts WHERE customer_id = $1", customer_id)
         if not accounts:
             raise ValueError(f"Customer {customer_id} not found.")
 
-        # Date range
         latest_casa = await conn.fetchval("SELECT MAX(txn_date) FROM casa_transactions")
         latest_card = await conn.fetchval("SELECT MAX(txn_date) FROM card_transactions")
         reference_date = max([d for d in [latest_casa, latest_card] if d])
@@ -61,7 +65,6 @@ async def get_customer_transactions(
         from_date = reference_date - timedelta(days=30 * months_back)
         to_date = reference_date
 
-        # Data check
         has_txns = await conn.fetchval("""
             SELECT COUNT(*) FROM (
                 SELECT 1 FROM casa_transactions c
@@ -76,7 +79,6 @@ async def get_customer_transactions(
         if has_txns == 0:
             raise ValueError(f"No transactions found for {customer_id} between {from_date} and {to_date}.")
 
-        # Final fetch
         query = """
             SELECT * FROM (
                 SELECT 'CASA' AS txn_type, c.txn_id, c.account_id, c.txn_date, 
@@ -95,18 +97,14 @@ async def get_customer_transactions(
             ORDER BY txn_date DESC, txn_time DESC
             LIMIT 100
         """
-
         rows = await conn.fetch(query, customer_id, from_date, to_date)
 
-        lines = [f"Transactions for {customer_id} from {from_date} to {to_date}", "-"*75]
+        lines = [f"Transactions for {customer_id} from {from_date} to {to_date}", "-" * 75]
         for i, row in enumerate(rows, 1):
             amount = float(row["amount"]) if row["amount"] else 0
             symbol = "+" if row["dr_cr_flag"] == "CR" else "-"
-            lines.append(f"{i:2d}. {row['txn_date']} {row['txn_time']} | {row['txn_type']} | {row['account_id']} | {symbol}{amount:,.2f} | {row['txn_description'][:40]}")
+            desc = row["txn_description"] if row["txn_description"] else row["merchant_name"]
+            lines.append(f"{i:2d}. {row['txn_date']} {row['txn_time']} | {row['txn_type']} | {row['account_id']} | {symbol}{amount:,.2f} | {desc[:40]}")
 
         lines.append("-" * 75)
         return "\n".join(lines[:50]) + ("\n...more..." if len(rows) > 50 else "")
-
-
-
-app = mcp.streamable_http_app
