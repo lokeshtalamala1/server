@@ -115,5 +115,5 @@ from fastapi import FastAPI
 
 def app():
     fastapi_app = FastAPI()
-    fastapi_app.mount("/mcp", mcp.asgi_app())
+    fastapi_app.include_router(mcp.router, prefix="/mcp")
     return fastapi_app
