@@ -108,11 +108,6 @@ async def get_customer_transactions(
         lines.append("-" * 75)
         return "\n".join(lines[:50]) + ("\n...more..." if len(rows) > 50 else "")
 
-# Create the ASGI app
-mcp_app = mcp.http_app(path='/mcp')
 
-def app():
-    mcp_app = mcp.http_app(path="/mcp")
-    fastapi_app = FastAPI(lifespan=mcp_app.lifespan)
-    fastapi_app.mount("/mcp-server", mcp_app)
-    return fastapi_app
+if __name__ == "__main__":
+    mcp.run()
