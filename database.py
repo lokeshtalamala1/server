@@ -3,7 +3,6 @@ import asyncpg
 import os
 from datetime import datetime, timedelta, date
 from mcp.server.fastmcp import FastMCP
-from fastapi import FastAPI
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -109,6 +108,5 @@ async def get_customer_transactions(
         return "\n".join(lines[:50]) + ("\n...more..." if len(rows) > 50 else "")
 
 
-print(dir(mcp))
-app = FastAPI()
-app.include_router(mcp.router)
+
+app = mcp.sse_app
