@@ -109,4 +109,4 @@ async def get_customer_transactions(
 
 
 
-app = mcp.sse_app
+app = mcp.streamable_http_app
