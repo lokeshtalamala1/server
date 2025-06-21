@@ -111,4 +111,6 @@ async def get_customer_transactions(
         return "\n".join(lines[:50]) + ("\n...more..." if len(rows) > 50 else "")
 
 # DO NOT call mcp.run() on Render
-app = mcp.sse_app  # Required for Render to detect the FastAPI app
+from fastapi import FastAPI
+app = FastAPI()
+app.mount("/mcp", mcp.sse_app)
