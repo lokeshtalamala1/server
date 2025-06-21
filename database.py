@@ -110,5 +110,5 @@ async def get_customer_transactions(
         lines.append("-" * 75)
         return "\n".join(lines[:50]) + ("\n...more..." if len(rows) > 50 else "")
 
-if __name__ == "__main__":
-    mcp.run(transport="streamable-http", host="0.0.0.0", port=8000)
+# DO NOT call mcp.run() on Render
+app = mcp.sse_app  # Required for Render to detect the FastAPI app
