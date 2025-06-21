@@ -115,5 +115,5 @@ from fastapi import FastAPI
 
 def app():
     fastapi_app = FastAPI()
-    fastapi_app.mount("/mcp", mcp.sse_app())
+    fastapi_app.mount("/mcp", mcp.app)
     return fastapi_app
