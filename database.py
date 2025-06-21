@@ -8,10 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Initialize FastMCP
-mcp = FastMCP(
-    title="Remote MCP Server",
-    version="1.0",
-)
+mcp = FastMCP("Remote MCP Server")
 
 # Env vars
 DB_HOST = os.getenv("DB_HOST", "localhost")
