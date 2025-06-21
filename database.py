@@ -112,6 +112,7 @@ async def get_customer_transactions(
 mcp_app = mcp.http_app(path='/mcp')
 
 def app():
-    fastapi_app = FastAPI()
+    mcp_app = mcp.http_app(path="/mcp")
+    fastapi_app = FastAPI(lifespan=mcp_app.lifespan)
     fastapi_app.mount("/mcp-server", mcp_app)
     return fastapi_app
