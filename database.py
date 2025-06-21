@@ -2,7 +2,7 @@ from typing import Any
 import asyncpg
 import os
 from datetime import datetime, timedelta, date
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 from dotenv import load_dotenv
 
 load_dotenv()
