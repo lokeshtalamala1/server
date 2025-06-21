@@ -111,6 +111,7 @@ async def get_customer_transactions(
 # Create the ASGI app
 mcp_app = mcp.http_app(path='/mcp')
 
-# Create a FastAPI app and mount the MCP server
-app = FastAPI()
-app.mount("/mcp-server", mcp_app)
+def app():
+    fastapi_app = FastAPI()
+    fastapi_app.mount("/mcp-server", mcp_app)
+    return fastapi_app
