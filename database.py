@@ -110,10 +110,9 @@ async def get_customer_transactions(
         lines.append("-" * 75)
         return "\n".join(lines[:50]) + ("\n...more..." if len(rows) > 50 else "")
 
-# DO NOT call mcp.run() on Render
-from fastapi import FastAPI
+# Create the ASGI app
+mcp_app = mcp.http_app(path='/mcp')
 
-def app():
-    fastapi_app = FastAPI()
-    fastapi_app.include_router(mcp.router, prefix="/mcp")
-    return fastapi_app
+# Create a FastAPI app and mount the MCP server
+app = FastAPI(lifespan=mcp_app.lifespan)
+app.mount("/mcp-server", mcp_app)
