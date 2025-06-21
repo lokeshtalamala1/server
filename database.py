@@ -56,6 +56,10 @@ def validate_and_format_date(date_input) -> str:
     else:
         raise ValueError(f"Invalid date type: {type(date_input)}")
 
+@mcp.router.get("/")
+def root():
+    return {"message": "MCP Server is live!"}
+
 @mcp.tool()
 async def get_customer_transactions(
     customer_id: str,
