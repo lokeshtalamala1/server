@@ -10,15 +10,19 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Setup MCP
+# Initialize FastMCP
 mcp = FastMCP("Remote MCP Server")
 
-# Expose FastAPI app from MCP for HTTP tool interface
-app = mcp.streamable_http_app()
+# Create a FastAPI app manually
+app = FastAPI()
 
-# Optional: add basic health check route
+# Mount MCP onto FastAPI
+app.mount("/mcp", mcp.streamable_http_app())
+
+# Now you can add custom routes!
 @app.get("/health", response_class=PlainTextResponse)
 async def health_check():
-    return "✅ Server is healthy and running MCP."
+    return "✅ MCP is alive and well"
 
 # Database config
 DB_HOST = os.getenv("DB_HOST", "localhost")
