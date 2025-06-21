@@ -16,7 +16,7 @@ mcp = FastMCP(
 # Load environment variables
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = int(os.getenv("DB_PORT", 5432))
-DB_NAME = os.getenv("DB_NAME", "mcp_db")
+DB_NAME = os.getenv("DB_NAME", "postgres")
 DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASS = os.getenv("DB_PASS", "password")
 
@@ -112,8 +112,12 @@ async def get_customer_transactions(
         lines.append("-" * 75)
         return "\n".join(lines[:50]) + ("\n...more..." if len(rows) > 50 else "")
 
+mcp.register_tool(get_customer_transactions)
+
 # For Render deployment
 if __name__ == "__main__":
     mcp.run()
 
-app = mcp.sse_app    # For Render deployment with SSE support
+# for Render deployment
+mcp.build()        # Build tool registry
+app = mcp.sse_app  # SSE app for Render
