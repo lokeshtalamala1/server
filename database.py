@@ -109,5 +109,5 @@ async def get_customer_transactions(
         return "\n".join(lines[:50]) + ("\n...more..." if len(rows) > 50 else "")
 
 
-if __name__ == "__main__":
-    mcp.run()
+app = FastAPI()
+app.include_router(mcp.router)
