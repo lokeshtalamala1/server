@@ -175,3 +175,5 @@ async def get_customer_transactions(
 
 if __name__ == "__main__":
     mcp.run()
+
+app = mcp.app  # Expose FastAPI app for Render to find
