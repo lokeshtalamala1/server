@@ -3,6 +3,7 @@ import asyncpg
 import json
 from datetime import datetime, timedelta, date
 from mcp.server.fastmcp import FastMCP
+from fastapi.responses import JSONResponse
 from openai import OpenAI
 import os
 
@@ -56,9 +57,9 @@ def validate_and_format_date(date_input) -> str:
     else:
         raise ValueError(f"Invalid date type: {type(date_input)}")
 
-@mcp.router.get("/")
-def root():
-    return {"message": "MCP Server is live!"}
+@mcp.sse_app.get("/")
+async def root():
+    return JSONResponse(content={"message": "MCP Server is live!"})
 
 @mcp.tool()
 async def get_customer_transactions(
