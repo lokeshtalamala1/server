@@ -110,5 +110,5 @@ async def get_customer_transactions(
         lines.append("-" * 75)
         return "\n".join(lines[:50]) + ("\n...more..." if len(rows) > 50 else "")
 
-# 👇 THIS IS THE ONLY THING NEEDED FOR RENDER:
-app = mcp.sse_app
+if __name__ == "__main__":
+    mcp.run(transport="streamable-http")
