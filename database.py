@@ -112,5 +112,5 @@ async def get_customer_transactions(
 mcp_app = mcp.http_app(path='/mcp')
 
 # Create a FastAPI app and mount the MCP server
-app = FastAPI(lifespan=mcp_app.lifespan)
+app = FastAPI()
 app.mount("/mcp-server", mcp_app)
