@@ -112,5 +112,8 @@ async def get_customer_transactions(
 
 # DO NOT call mcp.run() on Render
 from fastapi import FastAPI
-app = FastAPI()
-app.mount("/mcp", mcp.sse_app)
+
+def app():
+    fastapi_app = FastAPI()
+    fastapi_app.mount("/mcp", mcp.sse_app)
+    return fastapi_app
