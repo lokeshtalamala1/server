@@ -13,7 +13,7 @@ load_dotenv()
 mcp = FastMCP("Remote MCP Server")
 
 # Expose FastAPI app from MCP for HTTP tool interface
-app = mcp.streamable_http_app
+app = mcp.streamable_http_app()
 
 # Optional: add basic health check route
 @app.get("/health", response_class=PlainTextResponse)
