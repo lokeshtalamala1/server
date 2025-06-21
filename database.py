@@ -7,20 +7,19 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Initialize FastMCP instance
+# Initialize FastMCP
 mcp = FastMCP(
     title="Remote MCP Server",
     version="1.0",
 )
 
-# Load environment variables
+# Env vars
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = int(os.getenv("DB_PORT", 5432))
 DB_NAME = os.getenv("DB_NAME", "postgres")
 DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASS = os.getenv("DB_PASS", "password")
 
-# Global DB connection pool
 _db_pool = None
 
 async def get_db_pool():
@@ -46,16 +45,15 @@ async def get_customer_transactions(
     customer_id: str,
     months_back: int = 6
 ) -> str:
-    """Get recent transactions (CASA + CARD) for a customer by ID."""
     pool = await get_db_pool()
 
     async with pool.acquire() as conn:
-        # Validate customer
+        # Check customer
         accounts = await conn.fetch("SELECT account_id FROM accounts WHERE customer_id = $1", customer_id)
         if not accounts:
             raise ValueError(f"Customer {customer_id} not found.")
 
-        # Get latest txn_date across tables
+        # Date range
         latest_casa = await conn.fetchval("SELECT MAX(txn_date) FROM casa_transactions")
         latest_card = await conn.fetchval("SELECT MAX(txn_date) FROM card_transactions")
         reference_date = max([d for d in [latest_casa, latest_card] if d])
@@ -66,7 +64,7 @@ async def get_customer_transactions(
         from_date = reference_date - timedelta(days=30 * months_back)
         to_date = reference_date
 
-        # Check if any transactions exist
+        # Data check
         has_txns = await conn.fetchval("""
             SELECT COUNT(*) FROM (
                 SELECT 1 FROM casa_transactions c
@@ -81,7 +79,7 @@ async def get_customer_transactions(
         if has_txns == 0:
             raise ValueError(f"No transactions found for {customer_id} between {from_date} and {to_date}.")
 
-        # Fetch and return transactions
+        # Final fetch
         query = """
             SELECT * FROM (
                 SELECT 'CASA' AS txn_type, c.txn_id, c.account_id, c.txn_date, 
@@ -112,10 +110,5 @@ async def get_customer_transactions(
         lines.append("-" * 75)
         return "\n".join(lines[:50]) + ("\n...more..." if len(rows) > 50 else "")
 
-# For Render deployment
-if __name__ == "__main__":
-    mcp.run()
-
-# for Render deployment
-mcp.build()        # Build tool registry
-app = mcp.sse_app  # SSE app for Render
+# 👇 THIS IS THE ONLY THING NEEDED FOR RENDER:
+app = mcp.sse_app
