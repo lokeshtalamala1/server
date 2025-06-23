@@ -7,6 +7,7 @@ from openai import OpenAI
 import os
 
 mcp = FastMCP("database")
+app = cast(FastAPI, mcp.app)        #type: ignore
 
 # Database configuration
 DB_HOST = "localhost"
@@ -393,6 +394,4 @@ if __name__ == "__main__":
     import uvicorn
     from typing import cast
     from fastapi import FastAPI
-
-    app = cast(FastAPI, mcp.app)        #type: ignore
     uvicorn.run(app, host="0.0.0.0", port=8000)
