@@ -9,7 +9,7 @@ import uvicorn
 from typing import cast
 from fastapi import FastAPI
 
-mcp = FastAPIApp("database")        # HTTP-compatible version
+mcp = FastMCP("database")
 app = cast(FastAPI, mcp.app)        # type: ignore[attr-defined]
 
 # Database configuration
