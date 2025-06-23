@@ -3,7 +3,6 @@ import asyncpg
 import json
 from datetime import datetime, timedelta, date
 from mcp.server.fastmcp import FastMCP
-from mcp.server.httpmcp import FastAPIApp
 from openai import OpenAI
 import os
 import uvicorn
@@ -11,7 +10,7 @@ from typing import cast
 from fastapi import FastAPI
 
 mcp = FastAPIApp("database")        # HTTP-compatible version
-app = cast(FastAPI, mcp.app)        #type: ignore
+app = cast(FastAPI, mcp.app)        # type: ignore[attr-defined]
 
 # Database configuration
 DB_HOST = "localhost"
