@@ -1,0 +1,11 @@
+langchain-openai
+python-dotenv
+httpx
+mcp-use
+fastapi
+uvicorn
+mcp[http]
+asyncpg
+openai
+fastapi
+uvicorn
